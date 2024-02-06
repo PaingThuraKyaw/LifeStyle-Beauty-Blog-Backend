@@ -27,4 +27,5 @@ Route::prefix("/")->group(function(){
 
     // category
     Route::get('/category',[CategoryController::class,"index"]);
+    Route::post("/category",[CategoryController::class,"store"]);
 });
