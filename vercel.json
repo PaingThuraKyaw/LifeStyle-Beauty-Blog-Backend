@@ -2,7 +2,7 @@
     "version": 2,
     "functions": {
         "api/index.php": {
-            "runtime": "vercel-php@0.6.0"
+            "runtime": "vercel-php@8.1.2"
         }
     },
     "routes": [
@@ -15,9 +15,9 @@
     "env": {
         "APP_NAME": "Vercel Laravel",
         "APP_ENV": "production",
-        "APP_KEY": "base64:CmdwjUo++yDpyhSlx78ZXQi3wEzdYNC3R8jAV0sbNqk=",
-        "APP_DEBUG": "false",
-        "APP_URL": "https://laravel-vercel-sooty.vercel.app",
+        "APP_KEY": "base64:MWT7M0NJfg+rUMSt3FHk6yvGiDZOEDCu7JBcKfPqQow=",
+        "APP_DEBUG": "true",
+        "APP_URL": "https://life-style-beauty-blog-backend.vercel.app",
         "VERCEL_DEMO_MODE": "true",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
