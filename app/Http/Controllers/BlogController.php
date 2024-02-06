@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\BlogResource;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -18,7 +19,7 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $blogs = Blog::all();
+        $blogs = BlogResource::collection( Blog::all());
         return response()->json([
             "data" => $blogs
         ],200);
