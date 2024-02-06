@@ -13,10 +13,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $category = new Category();
+        $category = Category::all();
         return  response()->json([
-            "data" => $category->all()
-         ]);
+            "data" => $category
+         ],200);
     }
 
     /**
