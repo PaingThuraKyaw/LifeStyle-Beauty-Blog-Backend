@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
+    use HasUuids;
     /**
      * Display a listing of the resource.
      */
@@ -26,7 +28,7 @@ class CategoryController extends Controller
     {
 
         $validator = Validator::make($request->all(),[
-            "title" => "required|min:3"
+            "title" => "required|min:3|unique:categories,title"
         ]);
 
         if($validator->fails()){

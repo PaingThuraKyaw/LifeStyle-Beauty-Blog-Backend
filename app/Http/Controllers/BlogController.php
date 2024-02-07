@@ -8,7 +8,6 @@ use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\BlogResource;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -17,9 +16,17 @@ class BlogController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $blogs = BlogResource::collection( Blog::all());
+        $search = $request->query("search");
+        $category=$request->query("category");
+        $filter = Blog::query()->when($search,function($query) use ($search) {
+            $query->where('title','like',"%$search%");
+        })->when($category , function($query) use($category) {
+            $query->where("category_id","=",$category);
+        } )->get();
+
+        $blogs = BlogResource::collection($filter)  ;
         return response()->json([
             "data" => $blogs
         ],200);
@@ -31,7 +38,7 @@ class BlogController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|min:3',
+            'title' => 'required|min:3|unique:blogs,title',
             'description' => 'required|min:5',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             "category_id" => ['required', Rule::exists(Category::class, "id")],
@@ -87,7 +94,7 @@ class BlogController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+
     }
 
     /**
