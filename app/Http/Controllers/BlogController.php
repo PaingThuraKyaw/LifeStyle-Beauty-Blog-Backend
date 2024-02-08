@@ -23,12 +23,20 @@ class BlogController extends Controller
         $filter = Blog::query()->when($search,function($query) use ($search) {
             $query->where('title','like',"%$search%");
         })->when($category , function($query) use($category) {
-            $query->where("category_id","=",$category);
-        } )->get();
+            $query->where("category_id",$category);
+        } )->paginate(5);
+
 
         $blogs = BlogResource::collection($filter)  ;
+
         return response()->json([
-            "data" => $blogs
+            "body" => $blogs,
+            "pagination" => [
+            "total" => $filter->total(),
+            "PAGE_SIZE" => $filter->perPage(),
+            "current_page" => $filter->currentPage(),
+            "total_page" => $filter->lastPage(),
+        ]
         ],200);
     }
 
@@ -77,7 +85,7 @@ class BlogController extends Controller
 
 
         return response()->json([
-            "data" => $blog
+            "body" => $blog
         ]);
     }
 
@@ -94,6 +102,32 @@ class BlogController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|min:3',
+            'description' => 'required|min:5',
+            // 'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            "category_id" => ['required', Rule::exists(Category::class, "id")],
+        ]);
+
+
+        $blog = Blog::findOrFail($id);
+        $blog->title = $request->title;
+        $blog->description = $request->description;
+        $blog->category_id = $request->category_id;
+        $blog->save();
+
+        if($request->file("image")){
+
+        }
+
+
+        if ($validator->fails()) {
+            return response()->json([
+                "message" => $validator->errors()
+            ]);
+        }
+
+        return $blog;
 
     }
 

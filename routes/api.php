@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix("/")->group(function(){
     Route::get("/blog",[BlogController::class,'index']);
     Route::post("/blog",[BlogController::class,'store']);
+    Route::patch("/blog/{id}",[BlogController::class,"update"]);
 
     // category
     Route::get('/category',[CategoryController::class,"index"]);

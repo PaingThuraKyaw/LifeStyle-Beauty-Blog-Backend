@@ -21,9 +21,11 @@ class BlogResource extends JsonResource
             "title" => $this->title,
             "description" => $this->description,
             "category" => Category::findOrFail($this->category_id)->title,
+            "category_id" => $this->category_id,
             "created_blog" => Carbon::parse($this->created_at)->diffForHumans(),
             "image" => $this->image->image ,
             "extension" => $this->image->extension,
+            "pagination" => $this->currentPage
         ];
     }
 }
