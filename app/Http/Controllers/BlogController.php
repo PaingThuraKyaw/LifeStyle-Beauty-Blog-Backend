@@ -22,8 +22,8 @@ class BlogController extends Controller
         $category=$request->query("category");
         $filter = Blog::query()->when($search,function($query) use ($search) {
             $query->where('title','like',"%$search%");
-        })->when($category , function($query) use($category) {
-            $query->where("category_id",$category);
+        })->when($category, function($query) use($category) {
+          $category !== "all" &&  $query->where("category_id",$category);
         } )->paginate(5);
 
 

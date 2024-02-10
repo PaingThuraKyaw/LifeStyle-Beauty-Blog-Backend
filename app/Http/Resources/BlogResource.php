@@ -25,7 +25,6 @@ class BlogResource extends JsonResource
             "created_blog" => Carbon::parse($this->created_at)->diffForHumans(),
             "image" => $this->image->image ,
             "extension" => $this->image->extension,
-            "pagination" => $this->currentPage
         ];
     }
 }
