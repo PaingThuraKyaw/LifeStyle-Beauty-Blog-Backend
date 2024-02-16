@@ -25,6 +25,7 @@ Route::prefix("/")->group(function(){
     Route::get("/blog",[BlogController::class,'index']);
     Route::post("/blog",[BlogController::class,'store']);
     Route::patch("/blog/{id}",[BlogController::class,"update"]);
+    Route::get("/blog/{id}",[BlogController::class,"show"]);
 
     // category
     Route::get('/category',[CategoryController::class,"index"]);

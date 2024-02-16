@@ -8,6 +8,7 @@ use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\BlogResource;
+use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -55,7 +56,8 @@ class BlogController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                "message" => $validator->errors()
+                "body" => $validator->errors(),
+                "message" => "Something went wrong"
             ]);
         }
 
@@ -85,7 +87,7 @@ class BlogController extends Controller
 
 
         return response()->json([
-            "body" => $blog
+            "message" => "Blog created succesfully"
         ]);
     }
 
@@ -94,7 +96,16 @@ class BlogController extends Controller
      */
     public function show(string $id)
     {
-        //
+         try{
+
+            $blog = Blog::findOrFail($id);
+         return new BlogResource($blog);
+
+         }catch(Exception $e){
+            return response()->json([
+                "message" => "Blog Not Found"
+            ] , 404);
+         }
     }
 
     /**
@@ -123,7 +134,8 @@ class BlogController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                "message" => $validator->errors()
+                "body" => $validator->errors(),
+                "message" => "Unable to create blog"
             ]);
         }
 

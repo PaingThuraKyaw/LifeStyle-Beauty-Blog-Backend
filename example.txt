@@ -1,0 +1,3 @@
+category -> one to many -> blog
+blog -> one to one -> detail blog
+detail blog -> one to many -> related blog
