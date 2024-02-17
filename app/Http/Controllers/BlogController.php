@@ -99,7 +99,9 @@ class BlogController extends Controller
          try{
 
             $blog = Blog::findOrFail($id);
-         return new BlogResource($blog);
+         return response()->json([
+            "body" => new BlogResource($blog)
+         ],200);
 
          }catch(Exception $e){
             return response()->json([
