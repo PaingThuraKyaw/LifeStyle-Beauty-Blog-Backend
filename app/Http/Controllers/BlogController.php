@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\BlogResource;
 use Exception;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -96,6 +97,7 @@ class BlogController extends Controller
      */
     public function show(string $id)
     {
+        
          try{
 
             $blog = Blog::findOrFail($id);

@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CategoryController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,18 +16,31 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+
+
+
+
+// auth
+Route::prefix('/v1')->group(function () {
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
 });
 
 
-Route::prefix("/")->group(function(){
-    Route::get("/blog",[BlogController::class,'index']);
-    Route::post("/blog",[BlogController::class,'store']);
-    Route::patch("/blog/{id}",[BlogController::class,"update"]);
-    Route::get("/blog/{id}",[BlogController::class,"show"]);
+// authenticated route
+Route::middleware('auth:sanctum')->prefix('')->group(function () {
+    Route::post("/blog", [BlogController::class, 'store']);
+    Route::patch("/blog/{id}", [BlogController::class, "update"]);
+    Route::get("/blog/{id}", [BlogController::class, "show"]);
 
     // category
-    Route::get('/category',[CategoryController::class,"index"]);
-    Route::post("/category",[CategoryController::class,"store"]);
+    Route::post("/category", [CategoryController::class, "store"]);
+});
+
+// data view
+Route::prefix("/v1")->group(function () {
+    Route::get("/blog", [BlogController::class, 'index']);
+
+    // category
+    Route::get('/category', [CategoryController::class, "index"]);
 });
