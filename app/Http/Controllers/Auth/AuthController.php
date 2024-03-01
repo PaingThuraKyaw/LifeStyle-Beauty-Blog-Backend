@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\PasswordReset;
@@ -79,45 +80,71 @@ class AuthController extends Controller
 
     // ========= forgot_password =========== //
 
-  public function forgot_password(Request $request)
-{
-    $request->validate(['email' => 'required|email']);
-
-    $token = Str::random(50);
-    $domain = URL::to('/');
-    $url = $domain."/reset-password?token=".$token;
-
-    $data['url'] = $url;
-    $data['email'] = $request->email;
-    $data['title'] = "Reset your password";
-    $data['para'] = "You are receiving this email because we received a password reset request for your account.";
-    $data['content'] = "This password reset link will expire in 30 minutes.";
-
-    Mail::send("forgotPassword",["data" => $data],function(Message $message) use($request) {
-        $message->to($request->email)->subject("Reset Password ");
-    });
+    public function forgot_password(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $user = User::where("email", $request->email)->first();
 
 
-//    $existingReset = PasswordReset::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json([
+                'message' => 'The provided credentials are incorrect.'
+
+            ], 400);
+        }
 
 
-    $dateTime = Carbon::now()->format('Y-m-d H:i:s');
-    PasswordReset::updateOrCreate([
-        'email' => $request->email
-    ],
-    [
-        'email' => $request->email,
-        'token' => $token,
-        'create_at' => $dateTime
-    ]
-);
+        $token = Str::random(50);
+        $dateTime = Carbon::now()->format('Y-m-d H:i:s');
+        $resetData =  PasswordReset::updateOrCreate(
+            [
+                'email' => $request->email
+            ],
+            [
+                'email' => $request->email,
+                'token' => $token,
+                'create_at' => $dateTime
+            ]
 
+        );
 
-
-}
+        return response()->json([
+            "message" => "Reset your password",
+            "token" => $resetData->token
+        ], 200);
+    }
 
     public function reset_password(Request $request)
     {
 
+        $validate = Validator::make($request->all(), [
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        if ($validate->fails()) {
+            return response()->json([
+                "message" => $validate->errors()
+            ], 400);
+        }
+
+
+        $user = User::where("email", $request->email)->first();
+
+          if (!$user) {
+            return response()->json([
+                'message' => 'The provided credentials are incorrect.'
+
+            ], 400);
+        }
+
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json([
+            "message" => "Reset password successfully"
+        ],200);
     }
 }
