@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\BlogResource;
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -21,25 +22,25 @@ class BlogController extends Controller
     public function index(Request $request)
     {
         $search = $request->query("search");
-        $category=$request->query("category");
-        $filter = Blog::query()->when($search,function($query) use ($search) {
-            $query->where('title','like',"%$search%");
-        })->when($category, function($query) use($category) {
-          $category !== "all" &&  $query->where("category_id",$category);
-        } )->paginate(5);
+        $category = $request->query("category");
+        $filter = Blog::query()->when($search, function ($query) use ($search) {
+            $query->where('title', 'like', "%$search%");
+        })->when($category, function ($query) use ($category) {
+            $category !== "all" &&  $query->where("category_id", $category);
+        })->paginate(5);
 
 
-        $blogs = BlogResource::collection($filter)  ;
+        $blogs = BlogResource::collection($filter);
 
         return response()->json([
             "body" => $blogs,
             "pagination" => [
-            "total" => $filter->total(),
-            "PAGE_SIZE" => $filter->perPage(),
-            "current_page" => $filter->currentPage(),
-            "total_page" => $filter->lastPage(),
-        ]
-        ],200);
+                "total" => $filter->total(),
+                "PAGE_SIZE" => $filter->perPage(),
+                "current_page" => $filter->currentPage(),
+                "total_page" => $filter->lastPage(),
+            ]
+        ], 200);
     }
 
     /**
@@ -63,7 +64,7 @@ class BlogController extends Controller
         }
 
 
-         $blog = Blog::create([
+        $blog = Blog::create([
             'title' => $request->title,
             'description' => $request->description,
             "category_id" =>  Category::findOrFail($request->category_id)->id
@@ -95,22 +96,32 @@ class BlogController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        
-         try{
 
-            $blog = Blog::findOrFail($id);
-         return response()->json([
-            "body" => new BlogResource($blog)
-         ],200);
+public function show(string $id)
+{
+    $blog = Blog::findOrFail($id);
 
-         }catch(Exception $e){
-            return response()->json([
-                "message" => "Blog Not Found"
-            ] , 404);
-         }
+    if(!request()->bearerToken()){
+        return response()->json([
+            "message" => "Unauthorized"
+        ]);
     }
+
+    try {
+        return response()->json([
+            "body" => new BlogResource($blog)
+        ], 200);
+    } catch (AuthorizationException $e) {
+        return response()->json([
+            "message" => "Unauthorized"
+        ], 401);
+    } catch (Exception $e) {
+        return response()->json([
+            "message" => "Blog Not Found"
+        ], 404);
+    }
+}
+
 
     /**
      * Update the specified resource in storage.
@@ -131,8 +142,7 @@ class BlogController extends Controller
         $blog->category_id = $request->category_id;
         $blog->save();
 
-        if($request->file("image")){
-
+        if ($request->file("image")) {
         }
 
 
@@ -144,7 +154,6 @@ class BlogController extends Controller
         }
 
         return $blog;
-
     }
 
     /**

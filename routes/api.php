@@ -30,10 +30,9 @@ Route::prefix('/v1/')->group(function () {
 
 
 // authenticated route
-Route::middleware('auth:sanctum')->prefix('')->group(function () {
+Route::middleware('auth:sanctum')->prefix('/v1')->group(function () {
     Route::post("/blog", [BlogController::class, 'store']);
     Route::patch("/blog/{id}", [BlogController::class, "update"]);
-    Route::get("/blog/{id}", [BlogController::class, "show"]);
 
     // category
     Route::post("/category", [CategoryController::class, "store"]);
@@ -42,6 +41,7 @@ Route::middleware('auth:sanctum')->prefix('')->group(function () {
 // data view
 Route::prefix("/v1")->group(function () {
     Route::get("/blog", [BlogController::class, 'index']);
+    Route::get("/blog/{id}", [BlogController::class, "show"]);
 
     // category
     Route::get('/category', [CategoryController::class, "index"]);
